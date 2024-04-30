@@ -14,14 +14,14 @@ public class ImportCSVData {
 //    .filter(checkGender())
 
 
-    public boolean checkId() {
-
-    }
-    public boolean checkId() {
-
-    }
-    public boolean checkId() {
-
-    }
+//    public boolean checkId() {
+//
+//    }
+//    public boolean checkFirstName() {
+//
+//    }
+//    public boolean checkLastName() {
+//
+//    }
 
 }
