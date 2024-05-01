@@ -1,5 +1,7 @@
 package com.thejaavmahal.utils;
 
+import com.thejaavmahal.logging.LogHandler;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -10,8 +12,7 @@ import java.util.logging.Logger;
 
 // singleton connection
 public class ConnectionManager {
-    private static final ConnectionManager INSTANCE = new ConnectionManager();
-    private static final Logger LOGGER = Logger.getLogger(ConnectionManager.class.getName());
+    private static final Logger LOGGER = LogHandler.getLogger();
 
     private static Connection connection;
     private static String url;
@@ -20,14 +21,10 @@ public class ConnectionManager {
 
     private ConnectionManager() {}
 
-
-    public static ConnectionManager getInstance() {
-        return INSTANCE;
-    }
-
     public static Connection getConnection() {
         if (connection == null) {
             try {
+                LOGGER.config("Getting connection...");
                 loadProperties();
                 connection = DriverManager.getConnection(url, username, password);
             } catch (SQLException e) {
@@ -45,12 +42,14 @@ public class ConnectionManager {
                 LOGGER.severe("Failed to close connection: "+ e.getMessage());
             }
             finally {
+                LOGGER.warning("Setting connection to null.");
                 connection = null;
             }
         }
     }
 
     private static void loadProperties() {
+        LOGGER.config("Loading properties from file...");
         Properties properties = new Properties();
         try (FileReader reader = new FileReader("src/main/resources/database.properties")) {
             properties.load(reader);
@@ -60,6 +59,7 @@ public class ConnectionManager {
         } catch (IOException e) {
             LOGGER.severe("Failed to load database properties: "+ e.getMessage());
         }
+        LOGGER.config("Properties successfully loaded.");
     }
 
 }

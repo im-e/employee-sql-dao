@@ -6,21 +6,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Logger;
+
+import com.thejaavmahal.logging.LogHandler;
 import com.thejaavmahal.utils.ConnectionManager;
 import com.thejaavmahal.utils.Parser;
 
 public class DatabasePopulator implements PopulatorStatements {
 
     private static final Connection connection = ConnectionManager.getConnection();
-    private static final Logger LOGGER = Logger.getLogger("Logger");
+    private static final Logger LOGGER = LogHandler.getLogger();
 
     public static void init(){
-        LOGGER.info("Initializing Database Populator...");
+        LOGGER.info("Initialising Database Populator...");
         deleteEmployeesFromDatabase();
         populateEmployees(Parser.getEmployees());
-        LOGGER.config("Deleting parser list as database is populated");
         Parser.deleteEmployees();
-        LOGGER.info("Database Populator Initialized.");
+        LOGGER.info("Database Populator Initialised.");
     }
 
     private static void populateEmployees(List<Employee> employees){
@@ -28,7 +29,7 @@ public class DatabasePopulator implements PopulatorStatements {
         for(Employee employee : employees){
             addEmployeeToDatabase(employee);
         }
-        LOGGER.info("Employees populated successfully.");
+        LOGGER.config("Employees populated successfully.");
     }
 
     private static void addEmployeeToDatabase(Employee employee) {

@@ -6,8 +6,6 @@ import com.thejaavmahal.utils.Parser;
 
 public class App {
     public static void main(String[] args) {
-
-        LogHandler.init();
         Parser.init();
         DatabasePopulator.init();
 

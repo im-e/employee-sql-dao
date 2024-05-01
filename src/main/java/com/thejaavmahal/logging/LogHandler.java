@@ -1,5 +1,7 @@
 package com.thejaavmahal.logging;
 
+import com.thejaavmahal.App;
+
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -8,9 +10,17 @@ import java.util.logging.Logger;
 
 public class LogHandler {
 
-    private static final Logger LOGGER = Logger.getLogger("Logger");
+    private static Logger LOGGER;
 
-    public static void init() {
+    public static Logger getLogger() {
+        if (LOGGER == null) {
+            LOGGER = Logger.getLogger(App.class.getName());
+            init();
+        }
+        return LOGGER;
+    }
+
+    private static void init() {
         LOGGER.setUseParentHandlers(false);
         LOGGER.addHandler(getConsoleHandler());
         LOGGER.addHandler(getFileHandler());

@@ -1,6 +1,7 @@
 package com.thejaavmahal.utils;
 
 import com.thejaavmahal.employees.Employee;
+import com.thejaavmahal.logging.LogHandler;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,16 +20,16 @@ import java.util.stream.Collectors;
 public class Parser {
 
     private static List<Employee> parsedEmployees;
-    private static final Logger LOGGER = Logger.getLogger("Logger");
+    private static final Logger LOGGER = LogHandler.getLogger();
+
     public static void init()
     {
-        LOGGER.info("Initializing Parser...");
-        LOGGER.info("Getting employees from CSV...");
+        LOGGER.info("Initialising Parser...");
         ArrayList<String> rawEmployees = getEmployeesFromCSV();
-        LOGGER.info("Parsing employees data for corruption...");
         List<Employee> employeeList = parseUncheckedEmployeeData(rawEmployees);
-        LOGGER.info("Successfully parsed employees.");
         parsedEmployees = parseEmployees(employeeList);
+        LOGGER.config("Successfully parsed employees for corrupt data.");
+        LOGGER.info("Parser Initialised.");
     }
 
     public static List<Employee> getEmployees(){
@@ -36,10 +37,12 @@ public class Parser {
     }
 
     public static void deleteEmployees(){
+        LOGGER.config("Deleting parser list as database is populated");
         parsedEmployees.clear();
     }
 
     public static ArrayList<String> getEmployeesFromCSV() throws IllegalArgumentException {
+        LOGGER.info("Getting data from CSV...");
         ArrayList<String> result = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/employees-corrupted.csv"))) {
@@ -49,18 +52,21 @@ public class Parser {
                 result.add(line);
             }
         } catch (IOException e) {
-            LOGGER.severe("Could not read employees from CSV: " + e.getMessage());
+            LOGGER.severe("Could not read data from CSV: " + e.getMessage());
         }
 
+        LOGGER.config("Successfully read data from CSV.");
         return result;
     }
 
     public static List<Employee> parseUncheckedEmployeeData(ArrayList<String> rawData) {
+        LOGGER.info("Parsing data into employee objects...");
         ArrayList<Employee> employeeList = new ArrayList<>();
         for (String rawDatum : rawData) {
             String[] parsedEmployee = rawDatum.split(",");
             employeeList.add(new Employee(Integer.parseInt(parsedEmployee[0]), parsedEmployee[1], parsedEmployee[2], parsedEmployee[3].charAt(0), parsedEmployee[4], parsedEmployee[5].charAt(0), parsedEmployee[6], convertToDate(parsedEmployee[7]), convertToDate(parsedEmployee[8]), Integer.parseInt(parsedEmployee[9])));
         }
+        LOGGER.config("Successfully parsed data into employee objects.");
         return employeeList;
     }
 
@@ -72,6 +78,7 @@ public class Parser {
     }
 
     public static List<Employee> parseEmployees(List<Employee> employeeList) {
+        LOGGER.info("Parsing employee objects for corrupted data...");
         return employeeList.stream()
                 .filter(employee -> checkIfValidId(employee.empId()))
                 .filter(employee -> checkIfValidName(employee.firstName()))
