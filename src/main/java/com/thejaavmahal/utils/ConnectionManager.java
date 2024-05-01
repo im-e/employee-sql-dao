@@ -1,5 +1,7 @@
 package com.thejaavmahal;
 
+import com.thejaavmahal.logging.Log;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -22,13 +24,14 @@ public class ConnectionManager {
     public static ConnectionManager getInstance() {
         return INSTANCE;
     }
+
     public static Connection getConnection() {
         if (connection == null) {
             try {
                 loadProperties();
                 connection = DriverManager.getConnection(url, username, password);
             } catch (SQLException e) {
-                e.printStackTrace();
+                Log.severe("Driver manager failed to getConnection: "+ e.getMessage());
             }
         }
         return connection;
@@ -39,7 +42,7 @@ public class ConnectionManager {
             try {
                 connection.close();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                Log.severe("Failed to close connection: "+ e.getMessage());
             }
             finally {
                 connection = null;
@@ -55,8 +58,7 @@ public class ConnectionManager {
             username = properties.getProperty("username");
             password = properties.getProperty("password");
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to load database properties", e);
+            Log.severe("Failed to load database properties: "+ e.getMessage());
         }
     }
 
