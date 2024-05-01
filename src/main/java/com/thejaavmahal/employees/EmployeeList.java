@@ -1,21 +1,26 @@
 package com.thejaavmahal.employees;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeeList {
 
-    private static final ArrayList<Employee> employees = new ArrayList<>();
+    private static List<Employee> employeeList;
 
-    public static ArrayList<Employee> getEmployees() {
-        return employees;
+    public static List<Employee> getEmployeeList() {
+        return employeeList;
+    }
+
+    public static void setEmployeeList(List<Employee> employeeList) {
+        EmployeeList.employeeList = employeeList;
     }
 
     public static void addEmployee(Employee employee) {
-        employees.add(employee);
+        employeeList.add(employee);
     }
 
     public static void deleteEmployees() {
-        employees.clear();
+        employeeList.clear();
     }
 
 }
