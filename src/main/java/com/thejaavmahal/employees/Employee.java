@@ -1,15 +1,15 @@
 package com.thejaavmahal.employees;
 
-import java.util.Date;
+import java.sql.Date;
 
 // Employee Data Transfer Object
 public record Employee(
         int empId,
         String prefix,
         String firstName,
+        char initial,
         String lastName,
-        String initial,
-        String gender,
+        char gender,
         String email,
         Date dateOfBirth,
         Date dateOfJoin,

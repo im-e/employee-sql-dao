@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class EmployeeList {
 
-    private static  ArrayList<Employee> employees;
+    private static final ArrayList<Employee> employees = new ArrayList<>();
 
     public static ArrayList<Employee> getEmployees() {
         return employees;
