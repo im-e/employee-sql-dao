@@ -10,20 +10,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-;
 
 
 public class Parser {
 
     private static List<Employee> parsedEmployees;
-
+    private static final Logger LOGGER = Logger.getLogger("Logger");
     public static void init()
     {
+        LOGGER.info("Initializing Parser...");
+        LOGGER.info("Getting employees from CSV...");
         ArrayList<String> rawEmployees = getEmployeesFromCSV();
+        LOGGER.info("Parsing employees data for corruption...");
         List<Employee> employeeList = parseUncheckedEmployeeData(rawEmployees);
+        LOGGER.info("Successfully parsed employees.");
         parsedEmployees = parseEmployees(employeeList);
     }
 
@@ -45,7 +49,7 @@ public class Parser {
                 result.add(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.severe("Could not read employees from CSV: " + e.getMessage());
         }
 
         return result;
@@ -53,11 +57,10 @@ public class Parser {
 
     public static List<Employee> parseUncheckedEmployeeData(ArrayList<String> rawData) {
         ArrayList<Employee> employeeList = new ArrayList<>();
-        for (int i = 0; i < rawData.size(); i++) {
-            String[] parsedEmployee = rawData.get(i).split(",");
-            employeeList.add(new Employee(Integer.parseInt(parsedEmployee[0]), parsedEmployee[1], parsedEmployee[2],  parsedEmployee[3].charAt(0), parsedEmployee[4],  parsedEmployee[5].charAt(0),  parsedEmployee[6],  convertToDate(parsedEmployee[7]), convertToDate(parsedEmployee[8]),  Integer.parseInt(parsedEmployee[9])));
+        for (String rawDatum : rawData) {
+            String[] parsedEmployee = rawDatum.split(",");
+            employeeList.add(new Employee(Integer.parseInt(parsedEmployee[0]), parsedEmployee[1], parsedEmployee[2], parsedEmployee[3].charAt(0), parsedEmployee[4], parsedEmployee[5].charAt(0), parsedEmployee[6], convertToDate(parsedEmployee[7]), convertToDate(parsedEmployee[8]), Integer.parseInt(parsedEmployee[9])));
         }
-//        LOGGER.info("employee list: " + employeeList);
         return employeeList;
     }
 

@@ -5,34 +5,33 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-
-import com.thejaavmahal.logging.Log;
+import java.util.logging.Logger;
+import com.thejaavmahal.utils.ConnectionManager;
 import com.thejaavmahal.utils.Parser;
 
 public class DatabasePopulator implements PopulatorStatements {
 
-    private final Connection connection;
+    private static final Connection connection = ConnectionManager.getConnection();
+    private static final Logger LOGGER = Logger.getLogger("Logger");
 
-    public DatabasePopulator(Connection connection) {
-        Log.init();
-        Log.info("Initializing Database Populator...");
-        this.connection = connection;
+    public static void init(){
+        LOGGER.info("Initializing Database Populator...");
         deleteEmployeesFromDatabase();
         populateEmployees(Parser.getEmployees());
-        Log.config("Deleting EmployeeList as database is populated");
+        LOGGER.config("Deleting parser list as database is populated");
         Parser.deleteEmployees();
-        Log.info("Database Populator Initialized.");
+        LOGGER.info("Database Populator Initialized.");
     }
 
-    public void populateEmployees(List<Employee> employees){
-        Log.info("Populating employees from EmployeeList...");
+    private static void populateEmployees(List<Employee> employees){
+        LOGGER.info("Populating employees from EmployeeList...");
         for(Employee employee : employees){
             addEmployeeToDatabase(employee);
         }
-        Log.info("Employees populated successfully.");
+        LOGGER.info("Employees populated successfully.");
     }
 
-    public void addEmployeeToDatabase(Employee employee) {
+    private static void addEmployeeToDatabase(Employee employee) {
         //String sql = "INSERT INTO employees (employee_id, prefix, first_name, middle_initial, last_name, gender, email, date_of_birth, date_of_joining, salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement populateStatement = connection.prepareStatement(INSERT)) {
 
@@ -49,17 +48,17 @@ public class DatabasePopulator implements PopulatorStatements {
 
             populateStatement.executeUpdate();
         } catch (SQLException e) {
-            Log.warn("Error when populating the current employee: " + e.getMessage());
+            LOGGER.warning("Error when populating the current employee: " + e.getMessage());
         }
     }
 
-    public void deleteEmployeesFromDatabase() {
-        Log.info("Clearing the database...");
+    public static void deleteEmployeesFromDatabase() {
+        LOGGER.info("Clearing the database...");
         //String sql = "DELETE FROM employees WHERE employee_id > 0";
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(DELETE);
         } catch (SQLException e) {
-            Log.severe("Error when deleting employees from table: " + e.getMessage());
+            LOGGER.severe("Error when deleting employees from table: " + e.getMessage());
         }
     }
 
