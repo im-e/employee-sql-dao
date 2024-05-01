@@ -1,3 +1,9 @@
+# Database properties file
+*.properties
+
+# Employee Data
+# *.csv
+
 # Compiled class file
 *.class
 
