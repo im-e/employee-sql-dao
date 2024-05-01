@@ -1,16 +1,15 @@
 package com.thejaavmahal.employees;
 
-import java.util.Date;
+import java.sql.Date;
 
 // Employee Data Model
 public record EmployeeDTO(
         int empId,
-        String name,
         String prefix,
         String firstName,
+        char initials,
         String lastName,
-        String initials,
-        String gender,
+        char gender,
         String email,
         Date dateOfBirth,
         Date dateOfJoin,
