@@ -1,5 +1,7 @@
 package com.thejaavmahal;
 
+import com.thejaavmahal.employees.DatabasePopulator;
+import com.thejaavmahal.utils.ConnectionManager;
 import com.thejaavmahal.utils.Parser;
 
 public class App {
@@ -7,8 +9,10 @@ public class App {
         // Setup Logger
 
 
-        Parser parser = new Parser();
-        System.out.println(parser.getParsedEmployeeList());
+        Parser.init();
+        DatabasePopulator databasePopulator = new DatabasePopulator(ConnectionManager.getConnection());
+
+
 
         // Setup DB connection
 

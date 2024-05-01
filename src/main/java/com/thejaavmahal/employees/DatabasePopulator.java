@@ -17,7 +17,7 @@ public class DatabasePopulator implements PopulatorStatements {
         Log.info("Initializing Database Populator...");
         this.connection = connection;
         deleteEmployeesFromDatabase();
-        populateEmployees(EmployeeList.getEmployees());
+        populateEmployees(EmployeeList.getEmployeeList());
         Log.config("Deleting EmployeeList as database is populated");
         EmployeeList.deleteEmployees();
         Log.info("Database Populator Initialized.");

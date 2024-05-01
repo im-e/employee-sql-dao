@@ -1,6 +1,7 @@
 package com.thejaavmahal.utils;
 
-import com.thejaavmahal.employees.EmployeeDTO;
+import com.thejaavmahal.employees.Employee;
+import com.thejaavmahal.employees.EmployeeList;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,19 +18,16 @@ import java.util.stream.Collectors;
 
 
 public class Parser {
-    List<EmployeeDTO> parsedEmployeeList;
 
-    public Parser() {
+    public static void init()
+    {
         ArrayList<String> rawEmployees = getEmployees();
-        List<EmployeeDTO> employeeList = parseUncheckedEmployeeData(rawEmployees);
-        this.parsedEmployeeList = parseEmployees(employeeList);
+        List<Employee> employeeList = parseUncheckedEmployeeData(rawEmployees);
+        EmployeeList.setEmployeeList(parseEmployees(employeeList));
     }
 
-    public List<EmployeeDTO> getParsedEmployeeList() {
-        return parsedEmployeeList;
-    }
 
-    public static ArrayList<String> getEmployees() throws IllegalArgumentException {
+    private static ArrayList<String> getEmployees() throws IllegalArgumentException {
         ArrayList<String> result = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/employees-corrupted.csv"))) {
@@ -45,29 +43,29 @@ public class Parser {
         return result;
     }
 
-    public static List<EmployeeDTO> parseUncheckedEmployeeData(ArrayList<String> rawData) {
-        ArrayList<EmployeeDTO> employeeList = new ArrayList<>();
+    private static List<Employee> parseUncheckedEmployeeData(ArrayList<String> rawData) {
+        ArrayList<Employee> employeeList = new ArrayList<>();
         for (int i = 0; i < rawData.size(); i++) {
             String[] parsedEmployee = rawData.get(i).split(",");
-            employeeList.add(new EmployeeDTO(Integer.parseInt(parsedEmployee[0]), parsedEmployee[1], parsedEmployee[2],  parsedEmployee[3].charAt(0), parsedEmployee[4],  parsedEmployee[5].charAt(0),  parsedEmployee[6],  convertToDate(parsedEmployee[7]), convertToDate(parsedEmployee[8]),  Integer.parseInt(parsedEmployee[9])));
+            employeeList.add(new Employee(Integer.parseInt(parsedEmployee[0]), parsedEmployee[1], parsedEmployee[2],  parsedEmployee[3].charAt(0), parsedEmployee[4],  parsedEmployee[5].charAt(0),  parsedEmployee[6],  convertToDate(parsedEmployee[7]), convertToDate(parsedEmployee[8]),  Integer.parseInt(parsedEmployee[9])));
         }
 //        LOGGER.info("employee list: " + employeeList);
         return employeeList;
     }
 
-    public static Date convertToDate(String dateString) {
+    private static Date convertToDate(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
 
         LocalDate localDate = LocalDate.parse(dateString, formatter);
         return java.sql.Date.valueOf(localDate);
     }
 
-    public static List<EmployeeDTO> parseEmployees(List<EmployeeDTO> employeeList) {
+    private static List<Employee> parseEmployees(List<Employee> employeeList) {
         return employeeList.stream()
                 .filter(employee -> checkIfValidId(employee.empId()))
                 .filter(employee -> checkIfValidName(employee.firstName()))
                 .filter(employee -> checkIfValidName(employee.lastName()))
-                .filter(employee -> checkIfValidMiddleInitial(employee.initials()))
+                .filter(employee -> checkIfValidMiddleInitial(employee.initial()))
                 .filter(employee -> checkIfValidGender(employee.gender()))
                 .filter(employee -> checkIfValidEmail(employee.email()))
                 .filter(employee -> checkIfValidDateOfBirth(employee.dateOfBirth()))
