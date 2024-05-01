@@ -46,7 +46,7 @@ public class Log {
     }
 
     public static void info(String message) {
-        CONSOLE_LOGGER.info(ANSI_GREEN +  message + ANSI_RESET);
+        CONSOLE_LOGGER.info(ANSI_GREEN + message + ANSI_RESET);
         FILE_LOGGER.info(message);
     }
 

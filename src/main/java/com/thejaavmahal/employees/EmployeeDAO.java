@@ -1,6 +1,7 @@
 package com.thejaavmahal.employees;
 
 import com.thejaavmahal.ConnectionManager;
+import com.thejaavmahal.logging.Log;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,14 +11,33 @@ import java.sql.SQLException;
 // CRUD operations
 public class EmployeeDAO {
 
-    public static void main(String[] args) {
-        EmployeeDAO employeeDAO = new EmployeeDAO();
+    Connection connection;
 
-        // Replace with your field name and value
-        String fieldName = "employee_id";
-        int fieldValue = 321432;
+    public EmployeeDAO(Connection connection) {
+        Log.info("Starting Employee DAO");
+        this.connection = connection;
+    }
 
-        ResultSet resultSet = employeeDAO.queryFromField(fieldName, fieldValue);
+    public ResultSet queryFromField(String fieldName, int fieldValue) {
+        ResultSet resultSet = null;
+        try {
+            // Prepare the SQL statement
+            final String query = "SELECT * FROM employees WHERE " + fieldName + " = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            // Set parameter for the field value
+            preparedStatement.setInt(1, fieldValue); // Corrected here
+
+            // Execute the query
+            resultSet = preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            Log.info("Error while executing query: " + e.getMessage());
+        }
+        printResultSet(resultSet);
+        return resultSet;
+    }
+
+    private void printResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
                 // Iterate through the result set
@@ -30,42 +50,16 @@ public class EmployeeDAO {
                     String lastName = resultSet.getString("last_name");
                     String gender = resultSet.getString("gender");
                     // Process retrieved data here
-                    System.out.println("ID: " + id + " Prefix: " + prefix + ", First Name: " + firstName + ", Middle Initial: " + middleInitial + ", Last Name: " + lastName + ", Gender: " + gender);
+                    Log.info("ID: " + id + " Prefix: " + prefix + ", First Name: " + firstName + ", Middle Initial: " + middleInitial + ", Last Name: " + lastName + ", Gender: " + gender);
                 }
                 // Close the result set
                 resultSet.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                Log.severe("Error while executing query: " + e.getMessage());
             } finally {
                 // Close the connection when done
-                ConnectionManager.getInstance().closeConnection();
+                ConnectionManager.closeConnection();
             }
         }
-    }
-
-
-    public ResultSet queryFromField(String fieldName, int fieldValue) {
-        ResultSet resultSet = null;
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            // Get the connection from the ConnectionManager
-            connection = ConnectionManager.getInstance().getConnection();
-
-            // Prepare the SQL statement
-            String query = "SELECT * FROM employees WHERE " + fieldName + " = ?";
-            preparedStatement = connection.prepareStatement(query);
-
-            // Set parameter for the field value
-            preparedStatement.setInt(1, fieldValue); // Corrected here
-
-            // Execute the query
-            resultSet = preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return resultSet;
     }
 }
