@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.List;
 
 import com.thejaavmahal.logging.Log;
+import com.thejaavmahal.utils.Parser;
 
 public class DatabasePopulator implements PopulatorStatements {
 
@@ -17,9 +18,9 @@ public class DatabasePopulator implements PopulatorStatements {
         Log.info("Initializing Database Populator...");
         this.connection = connection;
         deleteEmployeesFromDatabase();
-        populateEmployees(EmployeeList.getEmployeeList());
+        populateEmployees(Parser.getEmployees());
         Log.config("Deleting EmployeeList as database is populated");
-        EmployeeList.deleteEmployees();
+        Parser.deleteEmployees();
         Log.info("Database Populator Initialized.");
     }
 

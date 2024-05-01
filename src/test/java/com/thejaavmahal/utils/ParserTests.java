@@ -1,6 +1,6 @@
 package com.thejaavmahal.utils;
 
-import com.thejaavmahal.employees.EmployeeDTO;
+import com.thejaavmahal.employees.Employee;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,8 +13,8 @@ import java.util.List;
 public class ParserTests {
 
     @Test
-    public void testGetEmployees() {
-        ArrayList<String> employees = Parser.getEmployees();
+    public void testGetEmployeesFromCSV() {
+        ArrayList<String> employees = Parser.getEmployeesFromCSV();
         assertThat(employees, not(empty()));
     }
 
@@ -28,13 +28,13 @@ public class ParserTests {
     public void testParseUncheckedEmployeeData() {
         ArrayList<String> rawData = new ArrayList<>();
         rawData.add("123456,Mr,John,J,Doe,M,Doe@example.com,1/1/1990,1/1/2020,50000");
-        List<EmployeeDTO> employeeList = Parser.parseUncheckedEmployeeData(rawData);
+        List<Employee> employeeList = Parser.parseUncheckedEmployeeData(rawData);
         assertThat(employeeList, hasSize(1));
-        EmployeeDTO employee = employeeList.get(0);
+        Employee employee = employeeList.get(0);
         assertEquals(123456, employee.empId());
         assertEquals("Mr", employee.prefix());
         assertEquals("John", employee.firstName());
-         assertEquals('J', employee.initials());
+         assertEquals('J', employee.initial());
         assertEquals("Doe", employee.lastName());
 
         assertEquals('M', employee.gender());
@@ -47,13 +47,13 @@ public class ParserTests {
     @Test
     public void testParseEmployees() {
         // Create a sample list of employees
-        List<EmployeeDTO> employeeList = new ArrayList<>();
-        EmployeeDTO employee1 = new EmployeeDTO(123456, "Mr", "John",'J',"Doe", 'M', "Doe@example.com", Date.valueOf("1990-01-01"), Date.valueOf("2020-01-01"), 50000);
-        EmployeeDTO employee2 = new EmployeeDTO(234567, "Ms", "Jane",'S',"Smith", 'F', "Smith@example.com", Date.valueOf("1995-05-15"), Date.valueOf("2021-02-10"), 60000);
+        List<Employee> employeeList = new ArrayList<>();
+        Employee employee1 = new Employee(123456, "Mr", "John",'J',"Doe", 'M', "Doe@example.com", Date.valueOf("1990-01-01"), Date.valueOf("2020-01-01"), 50000);
+        Employee employee2 = new Employee(234567, "Ms", "Jane",'S',"Smith", 'F', "Smith@example.com", Date.valueOf("1995-05-15"), Date.valueOf("2021-02-10"), 60000);
         employeeList.add(employee1);
         employeeList.add(employee2);
 
-        List<EmployeeDTO> parsedEmployees = Parser.parseEmployees(employeeList);
+        List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
 
         // Assert that all employees passed through the validation
         assertThat(parsedEmployees, contains(employee1, employee2));

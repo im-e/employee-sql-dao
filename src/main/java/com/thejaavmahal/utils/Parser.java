@@ -1,7 +1,6 @@
 package com.thejaavmahal.utils;
 
 import com.thejaavmahal.employees.Employee;
-import com.thejaavmahal.employees.EmployeeList;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,15 +18,24 @@ import java.util.stream.Collectors;
 
 public class Parser {
 
+    private static List<Employee> parsedEmployees;
+
     public static void init()
     {
-        ArrayList<String> rawEmployees = getEmployees();
+        ArrayList<String> rawEmployees = getEmployeesFromCSV();
         List<Employee> employeeList = parseUncheckedEmployeeData(rawEmployees);
-        EmployeeList.setEmployeeList(parseEmployees(employeeList));
+        parsedEmployees = parseEmployees(employeeList);
     }
 
+    public static List<Employee> getEmployees(){
+        return parsedEmployees;
+    }
 
-    private static ArrayList<String> getEmployees() throws IllegalArgumentException {
+    public static void deleteEmployees(){
+        parsedEmployees.clear();
+    }
+
+    public static ArrayList<String> getEmployeesFromCSV() throws IllegalArgumentException {
         ArrayList<String> result = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/employees-corrupted.csv"))) {
@@ -43,7 +51,7 @@ public class Parser {
         return result;
     }
 
-    private static List<Employee> parseUncheckedEmployeeData(ArrayList<String> rawData) {
+    public static List<Employee> parseUncheckedEmployeeData(ArrayList<String> rawData) {
         ArrayList<Employee> employeeList = new ArrayList<>();
         for (int i = 0; i < rawData.size(); i++) {
             String[] parsedEmployee = rawData.get(i).split(",");
@@ -53,14 +61,14 @@ public class Parser {
         return employeeList;
     }
 
-    private static Date convertToDate(String dateString) {
+    public static Date convertToDate(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
 
         LocalDate localDate = LocalDate.parse(dateString, formatter);
         return java.sql.Date.valueOf(localDate);
     }
 
-    private static List<Employee> parseEmployees(List<Employee> employeeList) {
+    public static List<Employee> parseEmployees(List<Employee> employeeList) {
         return employeeList.stream()
                 .filter(employee -> checkIfValidId(employee.empId()))
                 .filter(employee -> checkIfValidName(employee.firstName()))
