@@ -1,21 +1,22 @@
 package com.thejaavmahal.employees;
 
-import com.thejaavmahal.ConnectionManager;
-import com.thejaavmahal.logging.Log;
+import com.thejaavmahal.logging.LogHandler;
+import com.thejaavmahal.utils.ConnectionManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 // CRUD operations
 public class EmployeeDAO {
 
-    Connection connection;
+    private static final Connection connection = ConnectionManager.getConnection();
+    private final static Logger LOGGER = LogHandler.getLogger();
 
-    public EmployeeDAO(Connection connection) {
-        Log.info("Starting Employee DAO");
-        this.connection = connection;
+    public EmployeeDAO() {
+        LOGGER.info("Starting Employee DAO");
     }
 
     public ResultSet queryFromField(String fieldName, int fieldValue) {
@@ -31,7 +32,7 @@ public class EmployeeDAO {
             // Execute the query
             resultSet = preparedStatement.executeQuery();
         } catch (SQLException e) {
-            Log.info("Error while executing query: " + e.getMessage());
+            LOGGER.info("Error while executing query: " + e.getMessage());
         }
         printResultSet(resultSet);
         return resultSet;
@@ -50,12 +51,12 @@ public class EmployeeDAO {
                     String lastName = resultSet.getString("last_name");
                     String gender = resultSet.getString("gender");
                     // Process retrieved data here
-                    Log.info("ID: " + id + " Prefix: " + prefix + ", First Name: " + firstName + ", Middle Initial: " + middleInitial + ", Last Name: " + lastName + ", Gender: " + gender);
+                    LOGGER.info("ID: " + id + " Prefix: " + prefix + ", First Name: " + firstName + ", Middle Initial: " + middleInitial + ", Last Name: " + lastName + ", Gender: " + gender);
                 }
                 // Close the result set
                 resultSet.close();
             } catch (SQLException e) {
-                Log.severe("Error while executing query: " + e.getMessage());
+                LOGGER.severe("Error while executing query: " + e.getMessage());
             } finally {
                 // Close the connection when done
                 ConnectionManager.closeConnection();
