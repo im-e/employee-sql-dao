@@ -30,6 +30,9 @@ public class Parser {
         parsedEmployees = parseEmployees(employeeList);
         LOGGER.config("Successfully parsed employees for corrupt data.");
         LOGGER.info("Parser Initialised.");
+
+        int count = parsedEmployees.size() - rawEmployees.size();
+        LOGGER.info("Number of invalid records removed: " + Math.abs(count));
     }
 
     public static List<Employee> getEmployees(){
