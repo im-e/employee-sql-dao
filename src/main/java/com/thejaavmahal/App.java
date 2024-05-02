@@ -15,12 +15,14 @@ public class App {
     public static void main(String[] args) {
         Parser.init();
         DatabasePopulator.init();
-        // User requests CRUD operations on DAO
-        //EmployeeDAO employeeDAO = new EmployeeDAO();
-        EmployeeDAO.queryFromField("employee_id", 991462);
-        EmployeeDAO.queryFromField("employee_id", 114577);
 
+        EmployeeDAO.queryFromField("employee_id", 991462);
+
+        EmployeeDAO.queryFromField("employee_id", 114577);
         EmployeeDAO.deleteFromEmployees("employee_id", 114577);
+
+        EmployeeDAO.queryFromField("first_name", "Jason");
+
         EmployeeDAO.updateEmployee(192501, "middle_initial", "I");
         EmployeeDAO.queryFromField("employee_id", 192501);
 
@@ -30,8 +32,6 @@ public class App {
 
         EmployeeDAO.createEmployee(employee);
         EmployeeDAO.queryFromField("employee_id", 123456);
-
-
 
         EmployeeDAO.closeConnection();
     }

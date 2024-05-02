@@ -30,14 +30,14 @@ public class Parser {
         parsedEmployees = parseEmployees(employeeList);
 
         LOGGER.config("Successfully parsed employees for corrupt data.");
-        LOGGER.info("Parser Initialised.");
 
         int count = parsedEmployees.size() - rawEmployees.size();
-        LOGGER.info("Number of invalid records removed: " + Math.abs(count));
+        LOGGER.warning("Number of invalid records removed: " + Math.abs(count));
 
         List<Integer> s = parsedEmployees.stream().map(Employee::empId).toList();
 
-        LOGGER.info("Employees: " + s);
+        LOGGER.warning("Corrupted Employees: " + s);
+        LOGGER.info("Parser Initialised.");
     }
 
     public static List<Employee> getEmployees(){

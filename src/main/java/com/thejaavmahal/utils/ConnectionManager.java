@@ -24,7 +24,7 @@ public class ConnectionManager {
     public static Connection getConnection() {
         if (connection == null) {
             try {
-                LOGGER.config("Getting connection...");
+                LOGGER.fine("Getting connection...");
                 loadProperties();
                 connection = DriverManager.getConnection(url, username, password);
             } catch (SQLException e) {
@@ -47,7 +47,7 @@ public class ConnectionManager {
     }
 
     private static void loadProperties() {
-        LOGGER.config("Loading properties from file...");
+        LOGGER.fine("Loading properties from file...");
         Properties properties = new Properties();
         try (FileReader reader = new FileReader("src/main/resources/database.properties")) {
             properties.load(reader);
@@ -57,7 +57,7 @@ public class ConnectionManager {
         } catch (IOException e) {
             LOGGER.severe("Failed to load database properties: "+ e.getMessage());
         }
-        LOGGER.config("Properties successfully loaded.");
+        LOGGER.fine("Properties successfully loaded.");
     }
 
 }

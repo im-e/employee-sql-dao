@@ -1,8 +1,8 @@
 # Resources
-resources/
+src/main/resources/
 
 # Employee Data
-# *.csv
+*.csv
 
 # Compiled class file
 *.class

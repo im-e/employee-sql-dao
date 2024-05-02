@@ -1,79 +1,83 @@
 package com.thejaavmahal.employees;
 
 import com.thejaavmahal.logging.LogHandler;
+import com.thejaavmahal.logging.ResultHandler;
 import com.thejaavmahal.utils.ConnectionManager;
 
 import java.sql.*;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 // CRUD operations
-public class EmployeeDAO {
+public class EmployeeDAO implements DAOStatements{
 
 
     private final static Logger LOGGER = LogHandler.getLogger();
+    private final static Logger RESULT = ResultHandler.getResultLogger();
     private final static Connection CONNECTION = ConnectionManager.getConnection();
 
     public EmployeeDAO() {
         LOGGER.info("Starting Employee DAO");
     }
 
-    public static void queryFromField(String fieldName, Object fieldValue) {
-        LOGGER.config("Querying field: " + fieldName + " from " + fieldValue);
-        ResultSet resultSet = null;
-        try { // if u have it here
-            // Prepare the SQL statement
-            final String query = "SELECT * FROM employees WHERE " + fieldName + " = ?";
+    private static PreparedStatement setStatementFromValue(String query, Object fieldValue) {
+        try {
             PreparedStatement preparedStatement = CONNECTION.prepareStatement(query);
-
-            // Set parameter for the field value
             if (fieldValue instanceof Integer) {
                 preparedStatement.setInt(1, (Integer) fieldValue);
             } else if (fieldValue instanceof String) {
                 preparedStatement.setString(1, (String) fieldValue);
-            } // Add more conditions for other data types if needed
+            }
             else if (fieldValue instanceof Character) {
                 preparedStatement.setString(1, String.valueOf(fieldValue));
-            }// Add more conditions for other data types if needed
+            }
             else if (fieldValue instanceof Date) {
                 preparedStatement.setDate(1, (Date) fieldValue);
             }
+            return preparedStatement;
+        } catch (SQLException e) {
+            LOGGER.warning("Exception when setting statement from value: " + e.getMessage());
+            return null;
+        }
+    }
 
-
-            // Execute the query
+    public static void queryFromField(String fieldName, Object fieldValue) {
+        RESULT.config("Searching employees: " + fieldName + " -> " + fieldValue + "\n");
+        ResultSet resultSet = null;
+        try {
+            final String query = QUERY + fieldName + FIELD;
+            PreparedStatement preparedStatement = setStatementFromValue(query,fieldValue);
+            assert preparedStatement != null;
             resultSet = preparedStatement.executeQuery();
+            if (resultSet != null) {
+                int counter = 0;
+                while (resultSet.next()) {
+                    counter++;
+                    String result = resultSetToString(resultSet);
+                    RESULT.info(result);
+                }
+                if(counter != 0) RESULT.warning(counter + " Employee(s) found.");
+                else RESULT.severe("No employees found under query: " + fieldName + " -> " + fieldValue);
+                resultSet.close();
+            }
+
         } catch (SQLException e) {
             LOGGER.info("Error while executing query: " + e.getMessage());
         }
-        printResultSet(resultSet);
     }
 
     public static void deleteFromEmployees(String fieldName, Object fieldValue) {
-        LOGGER.config("Deleting employee from field: " + fieldName + " from " + fieldValue);
-        final String selectQuery = "SELECT * FROM employees WHERE " + fieldName + " = ?";
-        try (PreparedStatement selectStatement = CONNECTION.prepareStatement(selectQuery)) {
-            // Set parameter for the field value
-            if (fieldValue instanceof Integer) {
-                selectStatement.setInt(1, (Integer) fieldValue);
-            } else if (fieldValue instanceof String) {
-                selectStatement.setString(1, (String) fieldValue);
-            } else if (fieldValue instanceof Character) {
-                selectStatement.setString(1, String.valueOf(fieldValue));
-            } else if (fieldValue instanceof Date) {
-                selectStatement.setDate(1, (Date) fieldValue);
-            }
-            // Execute the SELECT query
+        RESULT.config("Deleting employee: " + fieldName + " from " + fieldValue + "\n");
+
+        try{
+            final String selectQuery = "SELECT * FROM employees WHERE " + fieldName + " = ?";
+            PreparedStatement selectStatement = setStatementFromValue(selectQuery,fieldValue);
+            assert selectStatement != null;
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 // Print details of the selected row (if found)
                 if (resultSet.next()) {
-                    int id = resultSet.getInt("employee_id");
-                    String prefix = resultSet.getString("prefix");
-                    String firstName = resultSet.getString("first_name");
-                    String middleInitial = resultSet.getString("middle_initial");
-                    String lastName = resultSet.getString("last_name");
-                    String gender = resultSet.getString("gender");
+                    String deletedEmployee = resultSetToString(resultSet);
                     // Print details of the row before deleting
-                    LOGGER.info("Row to be deleted: ID=" + id + ", Prefix=" + prefix + ", First Name=" + firstName + ", Middle Initial=" + middleInitial + ", Last Name=" + lastName + ", Gender=" + gender);
+                    RESULT.warning("Record to be deleted: " + deletedEmployee);
                 } else {
                     LOGGER.info("No matching row found for deletion.");
                     return; // No need to proceed with deletion if no row found
@@ -83,84 +87,72 @@ public class EmployeeDAO {
         catch (SQLException e) {
             LOGGER.info("Error while executing query: " + e.getMessage());
         }
-        // Prepare the SQL statement for DELETE
-        final String deleteQuery = "DELETE FROM employees WHERE " + fieldName + " = ?";
-        try (PreparedStatement deleteStatement = CONNECTION.prepareStatement(deleteQuery)) {
-            // Set parameter for the field value (same as in SELECT)
-            if (fieldValue instanceof Integer) {
-                deleteStatement.setInt(1, (Integer) fieldValue);
-            } else if (fieldValue instanceof String) {
-                deleteStatement.setString(1, (String) fieldValue);
-            } else if (fieldValue instanceof Character) {
-                deleteStatement.setString(1, String.valueOf(fieldValue));
-            } else if (fieldValue instanceof Date) {
-                deleteStatement.setDate(1, (Date) fieldValue);
-            }
-            // Execute the DELETE statement
+
+        try{
+            final String deleteQuery = "DELETE FROM employees WHERE " + fieldName + " = ?";
+            PreparedStatement deleteStatement = setStatementFromValue(deleteQuery, fieldValue);
+            assert deleteStatement != null;
             int rowsDeleted = deleteStatement.executeUpdate();
-            LOGGER.info(rowsDeleted + " row(s) deleted");
+            RESULT.severe(rowsDeleted + " record(s) deleted");
         } catch (SQLException e) {
             LOGGER.severe("Error while executing delete query: " + e.getMessage());
         }
 
     }
 
-    private static void printResultSet(ResultSet resultSet) {
-        LOGGER.fine("Printing result set");
-        if (resultSet != null) {
-            try {
-                // Iterate through the result set
-                while (resultSet.next()) {
-                    // Retrieve data from the result set
-                    int id = resultSet.getInt("employee_id");
-                    String prefix = resultSet.getString("prefix");
-                    String firstName = resultSet.getString("first_name");
-                    String middleInitial = resultSet.getString("middle_initial");
-                    String lastName = resultSet.getString("last_name");
-                    String gender = resultSet.getString("gender");
-                    // Process retrieved data here
-                    LOGGER.info("ID: " + id + " Prefix: " + prefix + ", First Name: " + firstName + ", Middle Initial: " + middleInitial + ", Last Name: " + lastName + ", Gender: " + gender);
-                }
-                // Close the result set
-                resultSet.close();
-            } catch (SQLException e) {
-                LOGGER.severe("Error while executing query: " + e.getMessage());
-            }
-        }
-    }
 
     public static void createEmployee(Employee employee) {
-        LOGGER.config("Creating employee: " + employee.empId());
+        RESULT.config("Creating employee: " + employee.empId()+ "\n");
         DatabasePopulator.addEmployeeToDatabase(employee);
     }
 
     public static void updateEmployee(int idToUpdate, String fieldNameToUpdate, Object fieldValueToUpdate) {
-        LOGGER.config("Updating employee: " + idToUpdate +" - " + fieldNameToUpdate + " to " + fieldValueToUpdate);
+        RESULT.config("Updating employee of id: " + idToUpdate +" | updating " + fieldNameToUpdate + " to " + fieldValueToUpdate + "\n");
         try{
             // Prepare the SQL statement
             final String query = "UPDATE employees SET " + fieldNameToUpdate + " = ? " +
                     " WHERE employee_id = " + idToUpdate + ";";
-            PreparedStatement preparedStatement = CONNECTION.prepareStatement(query);
-            // Set parameter for the field value
-            if (fieldValueToUpdate instanceof Integer) {
-                preparedStatement.setInt(1, (Integer) fieldValueToUpdate);
-            } else if (fieldValueToUpdate instanceof String) {
-                preparedStatement.setString(1, (String) fieldValueToUpdate);
-            } // Add more conditions for other data types if needed
-            else if (fieldValueToUpdate instanceof Character) {
-                preparedStatement.setString(1, String.valueOf(fieldValueToUpdate));
-            }// Add more conditions for other data types if needed
-            else if (fieldValueToUpdate instanceof Date) {
-                preparedStatement.setDate(1, (Date) fieldValueToUpdate);
-            }
-            // Execute the query
+
+            PreparedStatement preparedStatement = setStatementFromValue(query,fieldValueToUpdate);
+            assert preparedStatement != null;
             preparedStatement.executeUpdate();
         }
         catch (SQLException e)
         {
             LOGGER.warning("Error while executing query in updateEmployee: " + e.getMessage());
         }
+    }
 
+
+    private static String resultSetToString(ResultSet resultSet) {
+        try {
+            int id = resultSet.getInt("employee_id");
+            String prefix = resultSet.getString("prefix");
+            String firstName = resultSet.getString("first_name");
+            String middleInitial = resultSet.getString("middle_initial");
+            String lastName = resultSet.getString("last_name");
+            String gender = resultSet.getString("gender");
+            String email = resultSet.getString("email");
+            String dateOfBirth = resultSet.getString("date_of_birth");
+            String dateOfJoin = resultSet.getString("date_of_joining");
+            int salary = resultSet.getInt("salary");
+            return  "Employee: " + prefix + " " + firstName + " " + lastName + '\n' +
+                    ". Employee Id => " + id + '\n' +
+                    ". Employee Title => " + prefix + '\n' +
+                    ". Employee First Name => " + firstName + '\n' +
+                    ". Employee Middle Initial => " + middleInitial + '\n' +
+                    ". Employee Last Name => " + lastName + '\n' +
+                    ". Employee Gender => " + gender + '\n' +
+                    ". Employee Email Address => " + email + '\n' +
+                    ". Employee Date of Birth (YYYY-MM-DD) => " + dateOfBirth + '\n' +
+                    ". Employee Hire Date (YYYY-MM-DD) => " + dateOfJoin  + '\n' +
+                    ". Employee Salary => " + "£" + salary + "\n";
+        }
+        catch (SQLException e)
+        {
+            LOGGER.warning("Error while retrieving data from result set: " + e.getMessage());
+            return "";
+        }
 
     }
 
