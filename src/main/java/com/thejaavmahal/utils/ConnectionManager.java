@@ -40,9 +40,7 @@ public class ConnectionManager {
                 connection.close();
             } catch (SQLException e) {
                 LOGGER.severe("Failed to close connection: "+ e.getMessage());
-            }
-            finally {
-                LOGGER.warning("Setting connection to null.");
+                LOGGER.warning("Setting connection to null");
                 connection = null;
             }
         }
