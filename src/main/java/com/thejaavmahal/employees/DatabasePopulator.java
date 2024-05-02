@@ -32,7 +32,7 @@ public class DatabasePopulator implements PopulatorStatements {
         LOGGER.config("Employees populated successfully.");
     }
 
-    private static void addEmployeeToDatabase(Employee employee) {
+    public static void addEmployeeToDatabase(Employee employee) {
         //String sql = "INSERT INTO employees (employee_id, prefix, first_name, middle_initial, last_name, gender, email, date_of_birth, date_of_joining, salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement populateStatement = connection.prepareStatement(INSERT)) {
 
