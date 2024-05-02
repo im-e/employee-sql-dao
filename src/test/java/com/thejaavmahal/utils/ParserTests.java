@@ -1,6 +1,7 @@
 package com.thejaavmahal.utils;
 
 import com.thejaavmahal.employees.Employee;
+import com.thejaavmahal.logging.LogHandler;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,8 +9,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ParserTests {
+
+    private static final Logger LOGGER = LogHandler.getLogger();
 
     @Test
     public void testGetEmployeesFromCSV() {
@@ -28,7 +32,7 @@ public class ParserTests {
         ArrayList<String> rawData = new ArrayList<>();
         rawData.add("123456,Mr.,John,J,Doe,M,Doe@example.com,1/1/1990,1/1/2020,50000");
         List<Employee> employeeList = Parser.parseUncheckedEmployeeData(rawData);
-        Employee employee = employeeList.get(0);
+        Employee employee = employeeList.getFirst();
         assertEquals(123456, employee.empId());
         assertEquals("Mr.", employee.prefix());
         assertEquals("John", employee.firstName());
@@ -54,19 +58,12 @@ public class ParserTests {
         List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
 
         // Assert that all employees passed through the validation
-        //assertThat(parsedEmployees, contains(employee1, employee2));
+        Assumptions.assumeTrue(parsedEmployees.size() ==2);
     }
-
-    // Add tests for other methods similarly
-
 
     @Nested
     @DisplayName("Individual Employee Fields")
     class IndividualEmployeeFieldsTests{
-        @BeforeAll
-        static void setup(){
-            Parser parser = new Parser();
-        }
         @Test
         @DisplayName("Valid empID")
         void checkValidEmpID(){
@@ -77,13 +74,12 @@ public class ParserTests {
             employeeList.add(validEmployee);
             employeeList.add(invalidEmployee);
 
-            System.out.println(employeeList);
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
-            System.out.println(parsedEmployees);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
+
         @Test
         @DisplayName("Valid Prefix")
         void checkValidPrefix(){
@@ -97,7 +93,7 @@ public class ParserTests {
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
 
         @Test
@@ -113,7 +109,7 @@ public class ParserTests {
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
 
         @Test
@@ -129,7 +125,7 @@ public class ParserTests {
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
 
         @Test
@@ -145,7 +141,7 @@ public class ParserTests {
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
         @Test
         @DisplayName("Valid email")
@@ -160,7 +156,7 @@ public class ParserTests {
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
 
         @Test
@@ -176,7 +172,7 @@ public class ParserTests {
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
 
         @Test
@@ -192,7 +188,7 @@ public class ParserTests {
             List<Employee> parsedEmployees = Parser.parseEmployees(employeeList);
             // Assert that all employees passed through the validation
             Assumptions.assumeTrue(parsedEmployees.size() == 1);
-            Assumptions.assumeTrue(parsedEmployees.get(0).equals(validEmployee));
+            Assumptions.assumeTrue(parsedEmployees.getFirst().equals(validEmployee));
         }
 
     }
@@ -208,7 +204,6 @@ public class ParserTests {
 
         List<Employee> parsedEmployees = Parser.removeDuplicates(employeeList);
         // Assert that all employees passed through the validation
-        System.out.println(parsedEmployees);
         Assertions.assertEquals(0, parsedEmployees.size());
     }
 
@@ -222,11 +217,8 @@ public class ParserTests {
         employeeList.add(Employee1);
         employeeList.add(Employee2);
 
-//        System.out.println("111: " + employeeList);
         List<Employee> parsedEmployees = Parser.removeDuplicates(employeeList);
-//        System.out.println("222: " +employeeList);
         // Assert that all employees passed through the validation
-        System.out.println(parsedEmployees);
         Assertions.assertEquals(2, parsedEmployees.size());
     }
 }

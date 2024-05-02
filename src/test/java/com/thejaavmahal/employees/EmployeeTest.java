@@ -1,4 +1,4 @@
-package com.thejaavmahal;
+package com.thejaavmahal.employees;
 
 
 

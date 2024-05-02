@@ -1,5 +1,6 @@
 package com.thejaavmahal.utils;
 
+import com.mysql.cj.log.Log;
 import com.thejaavmahal.employees.Employee;
 import com.thejaavmahal.logging.LogHandler;
 
@@ -29,14 +30,14 @@ public class Parser {
         parsedEmployees = parseEmployees(employeeList);
 
         LOGGER.config("Successfully parsed employees for corrupt data.");
-        LOGGER.info("Parser Initialised.");
 
         int count = parsedEmployees.size() - rawEmployees.size();
-        LOGGER.info("Number of invalid records removed: " + Math.abs(count));
+        LOGGER.warning("Number of invalid records removed: " + Math.abs(count));
 
         List<Integer> s = parsedEmployees.stream().map(Employee::empId).toList();
 
-        LOGGER.info("Employees: " + s);
+        LOGGER.warning("Corrupted Employees: " + s);
+        LOGGER.info("Parser Initialised.");
     }
 
     public static List<Employee> getEmployees(){
@@ -80,9 +81,11 @@ public class Parser {
     }
 
     public static Date convertToDate(String dateString) {
+        LOGGER.finest("Converting date: " + dateString);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
 
         LocalDate localDate = LocalDate.parse(dateString, formatter);
+        LOGGER.finest("Converted date: " + localDate);
         return java.sql.Date.valueOf(localDate);
     }
 
@@ -105,6 +108,7 @@ public class Parser {
     }
 
     public static List<Employee> removeDuplicates(List<Employee> employees) {
+        LOGGER.config("Removing duplicates...");
         HashMap<Integer, Integer> idFreqMap = new HashMap<>();
         HashMap<Integer, Employee> idToEmployeeDictionary = new HashMap<>();
 
@@ -121,37 +125,39 @@ public class Parser {
                 uniqueEmployees.add(idToEmployeeDictionary.get(id));
             }
         }
-
         return uniqueEmployees;
     }
 
     private static boolean checkIfValidId(int ID){
+        LOGGER.finest("Checking if ID isn't more than 6 numbers: " + ID);
         int numberOfDigits = String.valueOf(ID).length();
         return numberOfDigits == 6;
     }
     private static boolean checkIfValidPrefix(String prefix){
+        LOGGER.finest("Checking if the prefix is part of the saved pre-set: " + prefix);
         List<String> myList = new ArrayList<>(Arrays.asList("Mr.", "Mrs.", "Ms.", "Dr.", "Drs.", "Hon.", "Prof."));
         Set<String> mySet = new HashSet<>(myList);
         return mySet.contains(prefix);
     }
 
-    private static boolean checkIfValidName(String name){  //use for first and last name
-        //name can only consist of letters
+    private static boolean checkIfValidName(String name){
+        LOGGER.finest("Checking if name contains symbols: " + name);
         String regex = ("^[a-zA-Z]+$");
         return name.matches(regex);
     }
 
     private static boolean checkIfValidMiddleInitial(char middleInitial){
-        //Not symbol & Length 1
+        LOGGER.finest("Checking if the middle initial is a single letter: " + middleInitial);
         return String.valueOf(middleInitial).matches("[a-zA-Z]");
     }
 
     private static boolean checkIfValidGender(char gender){
-        //has to be M or F
+        LOGGER.finest("Checking if the gender is 'M' or 'F': " + gender);
         return gender == 'M' || gender == 'F';
     }
 
     private static boolean checkIfValidEmail(String email){
+        LOGGER.finest("Checking if the email is in valid format: " + email);
         // Regular expression for email validation
         String regex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         // Compile the regex pattern
@@ -162,19 +168,18 @@ public class Parser {
     }
 
     private static boolean checkIfValidDateOfBirth(Date DoB){
-        //check in the past
-        //Do we want to add minimum age??
+        LOGGER.finest("Checking if the date of birth is in correct format: " + DoB);
         Date currentDate = Date.valueOf(LocalDate.now());
         return DoB.before(currentDate);
     }
 
     private static boolean checkIfValidDateOfJoining(Date DoJ, Date DoB){
-        //has to be in format YYYY-MM-DD & can't be before date of birth
+        LOGGER.finest("Checking if the date of joining is in correct format: " + DoB);
         Date currentDate = Date.valueOf(LocalDate.now());
-
         return DoJ.before(currentDate) && DoJ.after(DoB);
     }
     private static boolean checkIfValidSalary(int salary){
+        LOGGER.finest("Checking if the salary isn't negative: " + salary);
         return salary >= 0;
     }
 
