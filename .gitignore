@@ -1,5 +1,5 @@
-# Database properties file
-*.properties
+# Resources
+/resources
 
 # Employee Data
 # *.csv
