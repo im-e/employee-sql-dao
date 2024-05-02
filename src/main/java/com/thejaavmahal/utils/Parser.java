@@ -8,9 +8,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,8 +27,16 @@ public class Parser {
         ArrayList<String> rawEmployees = getEmployeesFromCSV();
         List<Employee> employeeList = parseUncheckedEmployeeData(rawEmployees);
         parsedEmployees = parseEmployees(employeeList);
+
         LOGGER.config("Successfully parsed employees for corrupt data.");
         LOGGER.info("Parser Initialised.");
+
+        int count = parsedEmployees.size() - rawEmployees.size();
+        LOGGER.info("Number of invalid records removed: " + Math.abs(count));
+
+        List<Integer> s = parsedEmployees.stream().map(Employee::empId).toList();
+
+        LOGGER.info("Employees: " + s);
     }
 
     public static List<Employee> getEmployees(){
@@ -64,7 +71,9 @@ public class Parser {
         ArrayList<Employee> employeeList = new ArrayList<>();
         for (String rawDatum : rawData) {
             String[] parsedEmployee = rawDatum.split(",");
-            employeeList.add(new Employee(Integer.parseInt(parsedEmployee[0]), parsedEmployee[1], parsedEmployee[2], parsedEmployee[3].charAt(0), parsedEmployee[4], parsedEmployee[5].charAt(0), parsedEmployee[6], convertToDate(parsedEmployee[7]), convertToDate(parsedEmployee[8]), Integer.parseInt(parsedEmployee[9])));
+            if (parsedEmployee[3].length() == 1 && parsedEmployee[5].length() == 1) {
+                employeeList.add(new Employee(Integer.parseInt(parsedEmployee[0]), parsedEmployee[1], parsedEmployee[2], parsedEmployee[3].charAt(0), parsedEmployee[4], parsedEmployee[5].charAt(0), parsedEmployee[6], convertToDate(parsedEmployee[7]), convertToDate(parsedEmployee[8]), Integer.parseInt(parsedEmployee[9])));
+            }
         }
         LOGGER.config("Successfully parsed data into employee objects.");
         return employeeList;
@@ -79,8 +88,9 @@ public class Parser {
 
     public static List<Employee> parseEmployees(List<Employee> employeeList) {
         LOGGER.info("Parsing employee objects for corrupted data...");
-        return employeeList.stream()
+        List<Employee> filtered = employeeList.stream()
                 .filter(employee -> checkIfValidId(employee.empId()))
+                .filter(employee -> checkIfValidPrefix(employee.prefix()))
                 .filter(employee -> checkIfValidName(employee.firstName()))
                 .filter(employee -> checkIfValidName(employee.lastName()))
                 .filter(employee -> checkIfValidMiddleInitial(employee.initial()))
@@ -90,11 +100,39 @@ public class Parser {
                 .filter(employee -> checkIfValidDateOfJoining(employee.dateOfJoin(), employee.dateOfBirth()))
                 .filter(employee -> checkIfValidSalary(employee.salary()))
                 .collect(Collectors.toList());
+
+        return removeDuplicates(filtered);
+    }
+
+    public static List<Employee> removeDuplicates(List<Employee> employees) {
+        HashMap<Integer, Integer> idFreqMap = new HashMap<>();
+        HashMap<Integer, Employee> idToEmployeeDictionary = new HashMap<>();
+
+        for (Employee employee: employees) {
+            int id = employee.empId();
+            idFreqMap.put(id, idFreqMap.getOrDefault(id, 0) + 1);
+            idToEmployeeDictionary.put(id, employee);
+        }
+
+        List<Employee> uniqueEmployees = new ArrayList<>();
+        for (Employee employee: employees) {
+            int id = employee.empId();
+            if (idFreqMap.get(id) == 1) {
+                uniqueEmployees.add(idToEmployeeDictionary.get(id));
+            }
+        }
+
+        return uniqueEmployees;
     }
 
     private static boolean checkIfValidId(int ID){
         int numberOfDigits = String.valueOf(ID).length();
         return numberOfDigits == 6;
+    }
+    private static boolean checkIfValidPrefix(String prefix){
+        List<String> myList = new ArrayList<>(Arrays.asList("Mr.", "Mrs.", "Ms.", "Dr.", "Drs.", "Hon.", "Prof."));
+        Set<String> mySet = new HashSet<>(myList);
+        return mySet.contains(prefix);
     }
 
     private static boolean checkIfValidName(String name){  //use for first and last name
