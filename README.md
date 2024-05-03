@@ -2,13 +2,13 @@
 Employee-sql-dao is a group project by 'The Jaav Mahal' consisting of Imogen, Murad, Oliver, Patrick, Patryk and Phoenix 👋.
 
 ## Project Overview
-This proejct creates a Java application that takes a CSV file which contains a List of Employees and their relevant personal details
+This project creates a Java application that takes a CSV file which contains a List of Employees and their relevant personal details
 and stores the data in a MYSQL database. Additioanlly, the application has built in functionality that can identify and remove 
 corrupted data in the file automatically, as well as the capability to allow for the user to create, update and remove specific employees.
 
 ## Dependencies
 
-JDK 21, Junit
+JDK 21, JUnit, Mockito
 
 
 ## How to Use the Project 
@@ -30,15 +30,12 @@ Open the project directory: "TheJaavMahal" and open the class "App". Ensure that
     DatabasePopulator.init();
 ```
 
-Within the main method you can access the data with the following queries.
+Within the main method you can access the data with the following queries:
 ```
-    EmployeeDAO.queryFromField("employee_id", 114577);
-    EmployeeDAO.deleteFromEmployees("employee_id", 114577);
-    EmployeeDAO.queryFromField("first_name", "Jason");
+    EmployeeDAO.queryFromField("employee_id", 114577);    
     EmployeeDAO.updateEmployee(192501, "middle_initial", "I");
-    EmployeeDAO.queryFromField("employee_id", 192501);
     EmployeeDAO.createEmployee(employee);
-    EmployeeDAO.queryFromField("employee_id", 123456);
+    EmployeeDAO.deleteEmployeeFromFieldWithValue("employee_id", 114577);
 ```
 You can use any combination or frequency of these methods, and by running the program the results of each search will be shown in the console.
 
