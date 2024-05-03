@@ -31,10 +31,10 @@ Open the project directory: "TheJaavMahal" and open the class "App". Ensure that
 ```
 
 Within the main method you can access the data with the following queries.
-Create - createEmployee()
-Read - queryFromFiled()
-Update - updateEmployee()
-Delete - deleteFromEmployees()
+- Create - createEmployee()
+- Read - queryFromFiled()
+- Update - updateEmployee()
+- Delete - deleteFromEmployees()
 
 ```
     EmployeeDAO.queryFromField("employee_id", 114577);
