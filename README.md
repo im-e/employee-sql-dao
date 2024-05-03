@@ -8,7 +8,7 @@ corrupted data in the file automatically, as well as the capability to allow for
 
 ## Dependencies
 
-JDK 21, Junitn Mockito
+JDK 21, JUnit, Mockito
 
 
 ## How to Use the Project 
