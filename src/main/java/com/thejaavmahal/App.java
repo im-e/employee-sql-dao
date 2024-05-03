@@ -3,13 +3,9 @@ package com.thejaavmahal;
 import com.thejaavmahal.employees.DatabasePopulator;
 import com.thejaavmahal.employees.Employee;
 import com.thejaavmahal.employees.EmployeeDAO;
-import com.thejaavmahal.logging.LogHandler;
-import com.thejaavmahal.utils.ConnectionManager;
 import com.thejaavmahal.utils.Parser;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.SQLException;
 
 public class App {
     public static void main(String[] args) {
@@ -19,7 +15,7 @@ public class App {
         EmployeeDAO.queryFromField("employee_id", 991462);
 
         EmployeeDAO.queryFromField("employee_id", 114577);
-        EmployeeDAO.deleteFromEmployees("employee_id", 114577);
+        EmployeeDAO.deleteEmployeeFromFieldWithValue("employee_id", 114577);
 
         EmployeeDAO.queryFromField("first_name", "Jason");
 

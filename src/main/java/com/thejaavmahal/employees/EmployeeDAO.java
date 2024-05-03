@@ -19,7 +19,8 @@ public class EmployeeDAO implements DAOStatements{
         LOGGER.info("Starting Employee DAO");
     }
 
-    private static PreparedStatement setStatementFromValue(String query, Object fieldValue) {
+
+    public static PreparedStatement setStatementFromValue(String query, Object fieldValue) {
         try {
             PreparedStatement preparedStatement = CONNECTION.prepareStatement(query);
             if (fieldValue instanceof Integer) {
@@ -40,14 +41,25 @@ public class EmployeeDAO implements DAOStatements{
         }
     }
 
-    public static void queryFromField(String fieldName, Object fieldValue) {
-        RESULT.config("Searching employees: " + fieldName + " -> " + fieldValue + "\n");
+    public static ResultSet executeSelectQuery(String fieldName, Object fieldValue) {
         ResultSet resultSet = null;
         try {
-            final String query = QUERY + fieldName + FIELD;
+            final String query = "SELECT * FROM employees WHERE " + fieldName + " = ?";
             PreparedStatement preparedStatement = setStatementFromValue(query,fieldValue);
             assert preparedStatement != null;
             resultSet = preparedStatement.executeQuery();
+            return resultSet;
+        } catch (SQLException e) {
+            LOGGER.info("Error while executing query: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    public static void queryFromField(String fieldName, Object fieldValue) {
+        RESULT.config("Searching employees with: " + fieldName + " -> " + fieldValue + "\n");
+        ResultSet resultSet = executeSelectQuery(fieldName, fieldValue);
+        try{
             if (resultSet != null) {
                 int counter = 0;
                 while (resultSet.next()) {
@@ -56,46 +68,36 @@ public class EmployeeDAO implements DAOStatements{
                     RESULT.info(result);
                 }
                 if(counter != 0) RESULT.warning(counter + " Employee(s) found.");
-                else RESULT.severe("No employees found under query: " + fieldName + " -> " + fieldValue);
+                else RESULT.severe("No employees found.");
                 resultSet.close();
             }
-
-        } catch (SQLException e) {
-            LOGGER.info("Error while executing query: " + e.getMessage());
+        }catch (SQLException e) {
+            LOGGER.info("Error while printing result set: " + e.getMessage());
         }
     }
 
-    public static void deleteFromEmployees(String fieldName, Object fieldValue) {
+    public static void deleteEmployeeFromFieldWithValue(String fieldName, Object fieldValue) {
         RESULT.config("Deleting employee: " + fieldName + " from " + fieldValue + "\n");
+        ResultSet resultSet = executeSelectQuery(fieldName, fieldValue);
 
         try{
-            final String selectQuery = "SELECT * FROM employees WHERE " + fieldName + " = ?";
-            PreparedStatement selectStatement = setStatementFromValue(selectQuery,fieldValue);
-            assert selectStatement != null;
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                // Print details of the selected row (if found)
-                if (resultSet.next()) {
-                    String deletedEmployee = resultSetToString(resultSet);
-                    // Print details of the row before deleting
-                    RESULT.warning("Record to be deleted: " + deletedEmployee);
-                } else {
-                    LOGGER.info("No matching row found for deletion.");
-                    return; // No need to proceed with deletion if no row found
-                }
+            assert resultSet != null;
+            if (resultSet.next()) {
+                String deletedEmployee = resultSetToString(resultSet);
+                // Print details of the row before deleting
+                RESULT.warning("Record to be deleted: " + deletedEmployee);
+            } else {
+                LOGGER.info("No matching row found for deletion.");
             }
-        }
-        catch (SQLException e) {
-            LOGGER.info("Error while executing query: " + e.getMessage());
-        }
 
-        try{
             final String deleteQuery = "DELETE FROM employees WHERE " + fieldName + " = ?";
             PreparedStatement deleteStatement = setStatementFromValue(deleteQuery, fieldValue);
             assert deleteStatement != null;
             int rowsDeleted = deleteStatement.executeUpdate();
             RESULT.severe(rowsDeleted + " record(s) deleted");
-        } catch (SQLException e) {
-            LOGGER.severe("Error while executing delete query: " + e.getMessage());
+        }
+        catch (SQLException e) {
+            LOGGER.info("Error while deleting record: " + e.getMessage());
         }
 
     }
@@ -124,7 +126,7 @@ public class EmployeeDAO implements DAOStatements{
     }
 
 
-    private static String resultSetToString(ResultSet resultSet) {
+    public static String resultSetToString(ResultSet resultSet) {
         try {
             int id = resultSet.getInt("employee_id");
             String prefix = resultSet.getString("prefix");

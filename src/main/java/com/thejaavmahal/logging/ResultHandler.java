@@ -27,7 +27,6 @@ public class ResultHandler {
         LOGGER.addHandler(getConsoleHandler());
         LOGGER.addHandler(getFileHandler());
         LOGGER.setLevel(Level.ALL);
-        LOGGER.info("Starting Search Results...");
     }
 
     private static ConsoleHandler getConsoleHandler(){
