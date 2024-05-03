@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -12,9 +13,14 @@ import java.util.List;
 public class DatabasePopulatorTests {
 
     private static List<Employee> employees;
+    private static Employee mockEmployee;
 
     @BeforeAll
     static void setUpBeforeClass() {
+        mockEmployee = Mockito.mock(Employee.class);
+        DatabasePopulator.addEmployeeToDatabase(mockEmployee);
+
+
         Employee employee1 = new Employee(401535,"Ms.","Theodora",
                 'G',"Hung",'F',"theodora.hung@aol.com",
                 Date.valueOf("1989-3-17"), Date.valueOf("2015-9-11"),40113);
@@ -26,6 +32,7 @@ public class DatabasePopulatorTests {
         employees.add(employee1);
         employees.add(employee2);
     }
+
 
 
   //@Test
