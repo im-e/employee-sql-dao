@@ -18,8 +18,39 @@ Setup: Ensure you have Java installed on your system.
 
 ## How to use the Program 
 
+Open the project directory: "TheJaavMahal" and open the class "App". Ensure that the init function has been called on the Parser and DatabasePopulator, this should come before use of the CRUD methods.
 
+```
+    Parser.init();
+    DatabasePopulator.init();
+```
+
+Within the main method you can access the data with the following queries.
+```
+    EmployeeDAO.queryFromField("employee_id", 114577);
+    EmployeeDAO.deleteFromEmployees("employee_id", 114577);
+    EmployeeDAO.queryFromField("first_name", "Jason");
+    EmployeeDAO.updateEmployee(192501, "middle_initial", "I");
+    EmployeeDAO.queryFromField("employee_id", 192501);
+    EmployeeDAO.createEmployee(employee);
+    EmployeeDAO.queryFromField("employee_id", 123456);
+```
+You can use any combination or frequency of these methods, and by running the program the results of each search will be shown in the console.
+
+For each run of App, there will be a recorded file of the results named SearchResult-YYYY-MM-DD---hh-mm-ss.txt. These can be found in the resources (src/main/resources) folder.
+
+To enhance maintainability we created logging functionality using java.util.logging. Our colour-coded logger allows you to easily track the flow of the program, record the state when an important event happens and capture errors or exceptions that occur during runtime. This can be used through the Log class and it's static methods.
 
 ##  
+
+## Acceptance Criteria
+- Read the csv file using File I/O and parse the data into a suitable data structure.
+- Parse the data correctly, ignoring the records that have corrupted data
+- Have a DAO class that performs crud operations on the data
+- Store data to database
+- Inform the user of how many employee records are corrupted using a suitable logging mechanism.
+
+##  
+
 📫 If you encounter any bugs, please open up an issue to let us know.
 Alternatively, we welcome suggestions for any updates or improvements you would like to see! 
