@@ -3,7 +3,7 @@ Employee-sql-dao is a group project by 'The Jaav Mahal' consisting of Imogen, Mu
 
 ## Project Overview
 This project creates a Java application that takes a CSV file which contains a List of Employees and their relevant personal details
-and stores the data in a MYSQL database. Additioanlly, the application has built in functionality that can identify and remove 
+and stores the data in a MYSQL database. Additionally, the application has built in functionality that can identify and remove 
 corrupted data in the file automatically, as well as the capability to allow for the user to create, update and remove specific employees.
 
 ## Dependencies
