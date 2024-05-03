@@ -30,20 +30,12 @@ Open the project directory: "TheJaavMahal" and open the class "App". Ensure that
     DatabasePopulator.init();
 ```
 
-Within the main method you can access the data with the following queries.
-- Create - createEmployee()
-- Read - queryFromFiled()
-- Update - updateEmployee()
-- Delete - deleteFromEmployees()
-
+Within the main method you can access the data with the following queries:
 ```
-    EmployeeDAO.queryFromField("employee_id", 114577);
-    EmployeeDAO.deleteFromEmployees("employee_id", 114577);
-    EmployeeDAO.queryFromField("first_name", "Jason");
+    EmployeeDAO.queryFromField("employee_id", 114577);    
     EmployeeDAO.updateEmployee(192501, "middle_initial", "I");
-    EmployeeDAO.queryFromField("employee_id", 192501);
     EmployeeDAO.createEmployee(employee);
-    EmployeeDAO.queryFromField("employee_id", 123456);
+    EmployeeDAO.deleteEmployeeFromFieldWithValue("employee_id", 114577);
 ```
 You can use any combination or frequency of these methods, and by running the program the results of each search will be shown in the console.
 
